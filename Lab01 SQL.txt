@@ -1,0 +1,8 @@
+SELECT 		[PS].[ProductCategoryKey] 		AS 'ProductCategoryKey'
+, 		[PS].[ProductSubcategoryKey] 		AS 'ProductSubcategoryKey'
+, 		[PC].[EnglishProductCategoryName] 	AS 'ProductCategoryName'
+, 		[PS].[EnglishProductSubcategoryName] 	AS 'ProductSubcategoryName'
+FROM 		[dbo].[DimProductSubcategory] 		AS [PS]
+LEFT JOIN 	[dbo].[DimProductCategory] 		AS [PC]
+ON 		[PS].[ProductCategoryKey] = [PC].[ProductCategoryKey]
+ORDER BY 	1, 2

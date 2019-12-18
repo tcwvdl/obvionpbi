@@ -1,0 +1,99 @@
+CustomerType =
+VAR LastOrderDateKey =
+    CALCULATE (
+        MAX ( FactInternetSales[OrderDateKey] );
+        USERELATIONSHIP ( DimCustomer[CustomerKey]; FactInternetSales[CustomerKey] )
+    )
+VAR LastOrderDate =
+    DATE ( LEFT ( LastOrderDateKey; 4 ); MID ( LastOrderDateKey; 5; 2 ); RIGHT ( LastOrderDateKey; 2 ) )
+RETURN
+    IF (
+        LastOrderDate = DimCustomer[DateFirstPurchase];
+        "One-time Customer";
+        "Return Customer"
+    )
+
+---------------------------------------------------------
+
+CustomerAge = FLOOR ( ( TODAY () - DimCustomer[BirthDate] ) / 365; 1 )
+
+---------------------------------------------------------
+
+CustomerAgeGroup =
+SWITCH (
+    TRUE ();
+    [CustomerAge] >= 65; "65 and over";
+    [CustomerAge] >= 50; "50 to 64";
+    [CustomerAge] >= 40; "40 to 49";
+    [CustomerAge] >= 30; "30 to 39";
+    [CustomerAge] >= 18; "18 to 29";
+    [CustomerAge] < 18; "Under 18"
+)
+
+---------------------------------------------------------
+
+Sales Revenue = SUM(FactInternetSales[TotalSales])
+
+---------------------------------------------------------
+
+Units Sold = SUM(FactInternetSales[OrderQuantity])
+
+---------------------------------------------------------
+
+Product Cost = SUM(FactInternetSales[TotalProductCost])
+
+---------------------------------------------------------
+
+Profit = SUMX(FactInternetSales; FactInternetSales[TotalSales]-FactInternetSales[TotalProductCost])
+
+---------------------------------------------------------
+
+Customer Count = COUNTROWS(DimCustomer)
+
+---------------------------------------------------------
+
+MonthYear = DimDate[EnglishMonthName] & " " & DimDate[CalendarYear]
+
+---------------------------------------------------------
+
+MonthYearNumber =
+CONCATENATE (
+    DimDate[CalendarYear];
+    IF (
+        DimDate[MonthNumberOfYear] < 10;
+        CONCATENATE ( 0; DimDate[MonthNumberOfYear] );
+        DimDate[MonthNumberOfYear]
+    )
+)
+
+---------------------------------------------------------
+
+QuarterYear =
+CONCATENATE (
+    CONCATENATE ( "Q"; DimDate[CalendarQuarter] );
+    CONCATENATE ( " "; DimDate[CalendarYear] )
+)
+
+---------------------------------------------------------
+
+QuarterYearNumber =
+CONCATENATE ( DimDate[CalendarYear]; DimDate[CalendarQuarter] )
+
+---------------------------------------------------------
+
+Sales Revenue QTD = TOTALQTD([Sales Revenue];DimDate[FullDateAlternateKey])
+
+---------------------------------------------------------
+
+Sales Revenue YTD = TOTALYTD([Sales Revenue];DimDate[FullDateAlternateKey])
+
+---------------------------------------------------------
+
+Sales Revenue RT = 
+CALCULATE(
+    [Sales Revenue];
+    FILTER(
+        ALL(DimDate);
+        DimDate[FullDateAlternateKey] <= MAX(DimDate[FullDateAlternateKey])
+    )
+)

@@ -1,0 +1,64 @@
+Product Rank = 
+RANKX(
+    ALL(DimProduct);
+    CALCULATE(FactInternetSales[Sales Revenue])
+)
+
+---------------------------------------------------------
+
+Product Rank = 
+IF(
+    HASONEVALUE(DimProduct[EnglishProductName]);
+    RANKX(
+        ALL(DimProduct[ProductSubcategoryName];DimProduct[EnglishProductName]);
+        CALCULATE([Sales Revenue])
+    )
+)
+
+---------------------------------------------------------
+
+CategoryImageURL = SWITCH(
+    TRUE();
+    DimProduct[ProductCategoryKey] = 1; "https://saobvion.blob.core.windows.net/adventureworks/Bikes.jpg";
+    DimProduct[ProductCategoryKey] = 2; "https://saobvion.blob.core.windows.net/adventureworks/Components.jpg";
+    DimProduct[ProductCategoryKey] = 3; "https://saobvion.blob.core.windows.net/adventureworks/Clothing.jpg";
+    DimProduct[ProductCategoryKey] = 4; "https://saobvion.blob.core.windows.net/adventureworks/Accessories.jpg";
+    "https://saobvion.blob.core.windows.net/adventureworks/Unknown.png"
+)
+
+---------------------------------------------------------
+
+Product Rank = 
+IF(
+    HASONEVALUE(DimProduct[EnglishProductName]);
+    RANKX(
+     ALL(DimProduct[ProductSubcategoryName];DimProduct[EnglishProductName];DimProduct[CategoryImageURL]);
+        CALCULATE([Sales Revenue])
+    )
+)
+
+---------------------------------------------------------
+
+Product Rank = 
+IF(
+    HASONEVALUE(DimProduct[EnglishProductName]);
+    RANKX(
+        ALLSELECTED(DimProduct);
+        CALCULATE([Sales Revenue])
+    )
+)
+
+---------------------------------------------------------
+
+Order Count = COUNTROWS(FactInternetSales)
+
+---------------------------------------------------------
+
+Customer Rank =
+IF(
+    HASONEVALUE(DimCustomer[FullName]);
+    RANKX(
+        ALLSELECTED(DimCustomer);
+        CALCULATE(FactInternetSales[Sales Revenue])
+    )
+)
